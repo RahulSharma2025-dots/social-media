@@ -1,0 +1,16 @@
+{
+    "private": true,
+    "scripts": {
+        "dev": "npm run development",
+        "development": "npm run dev",
+        "watch": "npm run dev",
+        "watch-poll": "npm run dev",
+        "hot": "npm run dev",
+        "prod": "npm run production",
+        "production": "npm run dev"
+    },
+    "devDependencies": {
+        "@popperjs/core": "^2.11.8",
+        "bootstrap": "^5.3.3"
+    }
+}
