@@ -29,6 +29,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
     Route::post('/posts/{post}/like', [PostController::class, 'like'])->name('posts.like');
     Route::post('/posts/{post}/comment', [PostController::class, 'comment'])->name('posts.comment');
+    Route::post('/comments/{comment}/reply', [PostController::class, 'reply'])->name('comments.reply');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
     
     // Bank Details Routes

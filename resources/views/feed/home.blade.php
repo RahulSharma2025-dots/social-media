@@ -7,6 +7,7 @@
     .like-btn.liked i {
         color: #e74c3c;
     }
+
     .like-btn.liked:hover i {
         color: #c0392b;
     }
@@ -216,99 +217,115 @@
 
 <!-- Posts Feed -->
 @foreach($posts as $post)
-    <div class="post-card">
-        <div class="post-header">
-            <img src="{{ $post->user->profile_picture ? asset('storage/'.$post->user->profile_picture) : asset('images/default-avatar.png') }}" alt="{{ $post->user->name }}" class="post-avatar">
-            <div class="user-info">
-                <a href="{{ route('profile', $post->user) }}" class="username">{{ $post->user->name }}</a>
-                <div class="post-time">{{ $post->created_at->diffForHumans() }}</div>
-            </div>
-        </div>
-
-        <div class="post-content">
-            <p>{{ $post->content }}</p>
-            @if($post->media->count() > 0)
-                <div class="post-media-slider" id="slider-{{ $post->id }}">
-                    <div class="slider-container">
-                        <div class="slider-track">
-                            @foreach($post->media as $media)
-                                <div class="slider-item">
-                                    @if($media->media_type === 'image')
-                                        <img src="{{ asset('storage/'.$media->media_path) }}" alt="{{ $post->user->name }}" class="post-image">
-                                    @elseif($media->media_type === 'video')
-                                        <video controls class="post-video">
-                                            <source src="{{ asset('storage/'.$media->media_path) }}" type="video/mp4">
-                                        </video>
-                                    @endif
-                                    <div class="media-type-indicator">
-                                        <i class="fas fa-{{ $media->media_type === 'image' ? 'image' : 'video' }}"></i>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                    @if($post->media->count() > 1)
-                        <button class="slider-nav slider-prev" onclick="prevSlide({{ $post->id }})">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <button class="slider-nav slider-next" onclick="nextSlide({{ $post->id }})">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                        <div class="slider-dots">
-                            @for($i = 0; $i < $post->media->count(); $i++)
-                                <div class="slider-dot {{ $i === 0 ? 'active' : '' }}" onclick="goToSlide({{ $post->id }}, {{ $i }})"></div>
-                            @endfor
-                        </div>
-                    @endif
-                </div>
-            @endif
-        </div>
-
-        <div class="post-actions">
-            <a href="{{ route('posts.like', $post->id) }}" class="action-btn like-btn {{ $post->likes->contains('user_id', auth()->id()) ? 'liked' : '' }}" data-post-id="{{ $post->id }}">
-                <i class="fas fa-heart"></i>
-                <span>{{ $post->likes->count() }}</span>
-            </a>
-            <a href="#" class="action-btn comment-btn" data-post-id="{{ $post->id }}">
-                <i class="fas fa-comment"></i>
-                <span>{{ $post->comments->count() }}</span>
-            </a>
-            <a href="#" class="action-btn share-btn" data-post-id="{{ $post->id }}">
-                <i class="fas fa-share"></i>
-            </a>
-            <a href="#" class="action-btn bookmark-btn" data-post-id="{{ $post->id }}">
-                <i class="fas fa-bookmark"></i>
-            </a>
-        </div>
-
-        <!-- Comments Section -->
-        <div class="comments-section" id="comments-{{ $post->id }}" style="display: none;">
-            <div class="comments-list">
-                @foreach($post->comments as $comment)
-                    <div class="comment">
-                        <img src="{{ $comment->user->profile_picture ? asset('storage/'.$comment->user->profile_picture) : asset('images/default-avatar.png') }}" 
-                             alt="{{ $comment->user->name }}" class="comment-avatar">
-                        <div class="comment-content">
-                            <div class="comment-header">
-                                <a href="{{ route('profile', $comment->user) }}" class="comment-username">{{ $comment->user->name }}</a>
-                                <span class="comment-time">{{ $comment->created_at->diffForHumans() }}</span>
-                            </div>
-                            <p class="comment-text">{{ $comment->content }}</p>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-            <form class="comment-form" data-post-id="{{ $post->id }}">
-                @csrf
-                <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Write a comment..." name="comment">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
-                </div>
-            </form>
+<div class="post-card">
+    <div class="post-header">
+        <img src="{{ $post->user->profile_picture ? asset('storage/'.$post->user->profile_picture) : asset('images/default-avatar.png') }}" alt="{{ $post->user->name }}" class="post-avatar">
+        <div class="user-info">
+            <a href="{{ route('profile', $post->user) }}" class="username">{{ $post->user->name }}</a>
+            <div class="post-time">{{ $post->created_at->diffForHumans() }}</div>
         </div>
     </div>
+
+    <div class="post-content">
+        <p>{{ $post->content }}</p>
+        @if($post->media->count() > 0)
+        <div class="post-media-slider" id="slider-{{ $post->id }}">
+            <div class="slider-container">
+                <div class="slider-track">
+                    @foreach($post->media as $media)
+                    <div class="slider-item">
+                        @if($media->media_type === 'image')
+                        <img src="{{ asset('storage/'.$media->media_path) }}" alt="{{ $post->user->name }}" class="post-image">
+                        @elseif($media->media_type === 'video')
+                        <video controls class="post-video">
+                            <source src="{{ asset('storage/'.$media->media_path) }}" type="video/mp4">
+                        </video>
+                        @endif
+                        <div class="media-type-indicator">
+                            <i class="fas fa-{{ $media->media_type === 'image' ? 'image' : 'video' }}"></i>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            @if($post->media->count() > 1)
+            <button class="slider-nav slider-prev" onclick="prevSlide({{ $post->id }})">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="slider-nav slider-next" onclick="nextSlide({{ $post->id }})">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <div class="slider-dots">
+                @for($i = 0; $i < $post->media->count(); $i++)
+                    <div class="slider-dot {{ $i === 0 ? 'active' : '' }}" onclick="goToSlide({{ $post->id }}, {{ $i }})"></div>
+                    @endfor
+            </div>
+            @endif
+        </div>
+        @endif
+    </div>
+
+    <div class="post-actions">
+        <a href="{{ route('posts.like', $post->id) }}" class="action-btn like-btn {{ $post->likes->contains('user_id', auth()->id()) ? 'liked' : '' }}" data-post-id="{{ $post->id }}">
+            <i class="fas fa-heart"></i>
+            <span>{{ $post->likes->count() }}</span>
+        </a>
+        <a href="#" class="action-btn comment-btn" data-post-id="{{ $post->id }}">
+            <i class="fas fa-comment"></i>
+            <span>{{ $post->comments->count() }}</span>
+        </a>
+        <a href="#" class="action-btn share-btn" data-post-id="{{ $post->id }}">
+            <i class="fas fa-share"></i>
+        </a>
+        <a href="#" class="action-btn bookmark-btn" data-post-id="{{ $post->id }}">
+            <i class="fas fa-bookmark"></i>
+        </a>
+    </div>
+
+    <!-- Comments Section -->
+    <div class="comments-section" id="comments-{{ $post->id }}" style="display: none;">
+        <div class="comments-list">
+            @foreach($post->comments as $comment)
+            <div class="comment">
+                <img src="{{ $comment->user->profile_picture ? asset('storage/'.$comment->user->profile_picture) : asset('images/default-avatar.png') }}"
+                    alt="{{ $comment->user->name }}" class="comment-avatar">
+                <div class="comment-content">
+                    <div class="comment-header">
+                        <a href="{{ route('profile', $comment->user) }}" class="comment-username">{{ $comment->user->name }}</a>
+                        <span class="comment-time">{{ $comment->created_at->diffForHumans() }}</span>
+                    </div>
+                    <p class="comment-text">{{ $comment->content }}</p>
+
+                    <!-- Reply Button -->
+                    <button class="btn btn-link reply-btn" data-comment-id="{{ $comment->id }}">Reply</button>
+
+                    <!-- Reply Input Field -->
+                    <div class="reply-form" id="reply-form-{{ $comment->id }}" style="display: none; margin-top: 0.5rem;">
+                        <form action="{{ route('comments.reply', $comment->id) }}" method="POST">
+                            @csrf
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Write a reply..." name="reply">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+        <form class="comment-form" data-post-id="{{ $post->id }}">
+            @csrf
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Write a comment..." name="comment">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 @endforeach
 
 {{ $posts->links() }}
@@ -386,7 +403,7 @@
             const postId = $button.data('post-id');
             const likeUrl = $button.attr('href');
             const isLiked = $button.hasClass('liked');
-            
+
             $.ajax({
                 url: likeUrl,
                 method: 'POST',
@@ -396,7 +413,7 @@
                 success: function(response) {
                     const $likeCountSpan = $button.find('span');
                     const currentCount = parseInt($likeCountSpan.text());
-                    
+
                     if (isLiked) {
                         // Unlike
                         $likeCountSpan.text(currentCount - 1);
@@ -418,10 +435,10 @@
             e.preventDefault();
             const postId = $(this).data('post-id');
             const commentsSection = $(`#comments-${postId}`);
-            
+
             // Toggle comments section
             commentsSection.slideToggle();
-            
+
             // Focus on comment input if showing
             if (commentsSection.is(':visible')) {
                 commentsSection.find('input[name="comment"]').focus();
@@ -524,7 +541,7 @@
             Array.from(files).forEach((file, index) => {
                 const isImage = file.type.startsWith('image/');
                 const isVideo = file.type.startsWith('video/');
-                
+
                 if (!isImage && !isVideo) {
                     $statusMessage.text('Only images and videos are allowed');
                     return;
@@ -567,7 +584,7 @@
         function updateStatus() {
             const fileCount = $('#preview-grid .preview-item').length;
             const $statusMessage = $('#status-message');
-            
+
             if (fileCount === 0) {
                 $statusMessage.text('No media selected');
             } else {
@@ -578,15 +595,15 @@
         function updateFileList() {
             const $fileInput = $('#media-upload');
             const dataTransfer = new DataTransfer();
-            
+
             // Get all files from the input
             const files = $fileInput[0].files;
-            
+
             // Add each file to the DataTransfer object
             for (let i = 0; i < files.length; i++) {
                 dataTransfer.items.add(files[i]);
             }
-            
+
             // Update the input's files
             $fileInput[0].files = dataTransfer.files;
         }
@@ -595,6 +612,13 @@
         $('#create-post-form').on('submit', function() {
             const $statusMessage = $('#status-message');
             $statusMessage.html('<i class="fas fa-spinner fa-spin me-2"></i>Uploading...');
+        });
+
+        $('.reply-btn').on('click', function () {
+            const commentId = $(this).data('comment-id');
+            const replyForm = $(`#reply-form-${commentId}`);
+
+            replyForm.toggle();
         });
     });
 </script>
