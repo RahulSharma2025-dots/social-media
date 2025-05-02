@@ -11,12 +11,27 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Check if users and posts tables exist
+        if (!Schema::hasTable('users') || !Schema::hasTable('posts')) {
+            throw new \Exception('Users and Posts tables must exist before creating Comments table');
+        }
+
         Schema::create('comments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('post_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('post_id');
             $table->text('content');
             $table->timestamps();
+
+            $table->foreign('user_id')
+                  ->references('id')
+                  ->on('users')
+                  ->onDelete('cascade');
+
+            $table->foreign('post_id')
+                  ->references('id')
+                  ->on('posts')
+                  ->onDelete('cascade');
         });
     }
 

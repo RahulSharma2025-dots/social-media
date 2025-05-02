@@ -5,52 +5,7 @@
 @section('main-content')
 <div class="d-flex" style="height:100vh;">
     <!-- Left Sidebar -->
-    <!-- <aside class="message-sidebar d-flex flex-column">
-        <div class="message-sidebar-header">
-            <form class="message-search">
-                <div class="input-group">
-                    <span class="input-group-text bg-transparent border-0">
-                        <i class="fas fa-search text-muted"></i>
-                    </span>
-                    <input type="text" class="form-control" placeholder="Search conversations...">
-                </div>
-            </form>
-        </div>
-        <div class="message-sidebar-content flex-grow-1 overflow-auto">
-            <div class="message-list">
-                <a href="#" class="message-item active">
-                    <img src="{{ asset('images/man.jpg') }}" class="message-avatar" alt="John Smith">
-                    <div class="message-info flex-grow-1">
-                        <h6>John Smith</h6>
-                        <div class="d-flex align-items-center">
-                            <span class="message-preview">Looking forward to our session tomorrow!</span>
-                            <span class="message-time ms-auto">10:30 AM</span>
-                        </div>
-                    </div>
-                </a>
-                <a href="#" class="message-item">
-                    <img src="{{ asset('images/woman.jpg') }}" class="message-avatar" alt="Sarah Johnson">
-                    <div class="message-info flex-grow-1">
-                        <h6>Sarah Johnson</h6>
-                        <div class="d-flex align-items-center">
-                            <span class="message-preview">Thanks for the great tech advice!</span>
-                            <span class="message-time ms-auto">10:32 AM</span>
-                        </div>
-                    </div>
-                </a>
-                <a href="#" class="message-item">
-                    <img src="{{ asset('images/man.jpg') }}" class="message-avatar" alt="Mike Wilson">
-                    <div class="message-info flex-grow-1">
-                        <h6>Mike Wilson</h6>
-                        <div class="d-flex align-items-center">
-                            <span class="message-preview">Can we reschedule our meeting?</span>
-                            <span class="message-time ms-auto">10:35 AM</span>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        </div>
-    </aside> -->
+  
 
     <aside class="message-sidebar d-flex flex-column" style="min-width: 320px; max-width: 350px; border-left: 1px solid #e5e7eb; background: #fff;">
         <div class="message-sidebar-header">
