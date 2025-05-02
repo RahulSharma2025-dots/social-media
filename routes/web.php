@@ -18,6 +18,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\ChatController;
 
 // Regular user authentication routes
 Auth::routes();
@@ -72,6 +73,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/bookmarks', [BookmarkController::class, 'index'])->name('bookmarks');
     Route::post('/bookmarks/{post}', [BookmarkController::class, 'store'])->name('bookmarks.store');
     Route::delete('/bookmarks/{post}', [BookmarkController::class, 'destroy'])->name('bookmarks.destroy');
+
+    // Chat Routes
+    Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+    Route::get('/chat/{user}', [ChatController::class, 'show'])->name('chat.show');
+    Route::post('/chat/{user}', [ChatController::class, 'store'])->name('chat.store');
+    Route::get('/chat/{user}/messages', [ChatController::class, 'getMessages'])->name('chat.getMessages');
+    Route::post('/chat/{user}/read', [ChatController::class, 'markAsRead'])->name('chat.markAsRead');
 });
 
 // Profile routes
