@@ -64,6 +64,12 @@
         color: #4a5568;
     }
 
+    .comment.reply {
+        margin-left: 2rem;
+        padding-left: 1rem;
+        border-left: 2px solid #e2e8f0;
+    }
+
     .comment-form {
         margin-top: 1rem;
     }
@@ -258,7 +264,7 @@
             <div class="slider-dots">
                 @for($i = 0; $i < $post->media->count(); $i++)
                     <div class="slider-dot {{ $i === 0 ? 'active' : '' }}" onclick="goToSlide({{ $post->id }}, {{ $i }})"></div>
-                    @endfor
+                @endfor
             </div>
             @endif
         </div>
@@ -285,7 +291,7 @@
     <!-- Comments Section -->
     <div class="comments-section" id="comments-{{ $post->id }}" style="display: none;">
         <div class="comments-list">
-            @foreach($post->comments as $comment)
+            @foreach($post->comments->whereNull('parent_id') as $comment)
             <div class="comment">
                 <img src="{{ $comment->user->profile_picture ? asset('storage/'.$comment->user->profile_picture) : asset('images/default-avatar.png') }}"
                     alt="{{ $comment->user->name }}" class="comment-avatar">
@@ -311,6 +317,76 @@
                             </div>
                         </form>
                     </div>
+
+                    <!-- Replies Section -->
+                    @if($comment->replies->count() > 0)
+                    <div class="replies-section">
+                        @foreach($comment->replies()->orderBy('created_at', 'asc')->get() as $reply)
+                        <div class="comment reply">
+                            <img src="{{ $reply->user->profile_picture ? asset('storage/'.$reply->user->profile_picture) : asset('images/default-avatar.png') }}"
+                                alt="{{ $reply->user->name }}" class="comment-avatar">
+                            <div class="comment-content">
+                                <div class="comment-header">
+                                    <a href="{{ route('profile', $reply->user) }}" class="comment-username">{{ $reply->user->name }}</a>
+                                    <span class="comment-time">{{ $reply->created_at->diffForHumans() }}</span>
+                                </div>
+                                <p class="comment-text">{{ $reply->content }}</p>
+                                
+                                <!-- Reply Button for Replies -->
+                                <button class="btn btn-link reply-btn" data-comment-id="{{ $reply->id }}">Reply</button>
+
+                                <!-- Reply Input Field for Replies -->
+                                <div class="reply-form" id="reply-form-{{ $reply->id }}" style="display: none; margin-top: 0.5rem;">
+                                    <form action="{{ route('comments.reply', $reply->id) }}" method="POST">
+                                        @csrf
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" placeholder="Write a reply..." name="reply">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-paper-plane"></i>
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <!-- Nested Replies -->
+                                @if($reply->replies->count() > 0)
+                                <div class="replies-section">
+                                    @foreach($reply->replies()->orderBy('created_at', 'asc')->get() as $nestedReply)
+                                    <div class="comment reply">
+                                        <img src="{{ $nestedReply->user->profile_picture ? asset('storage/'.$nestedReply->user->profile_picture) : asset('images/default-avatar.png') }}"
+                                            alt="{{ $nestedReply->user->name }}" class="comment-avatar">
+                                        <div class="comment-content">
+                                            <div class="comment-header">
+                                                <a href="{{ route('profile', $nestedReply->user) }}" class="comment-username">{{ $nestedReply->user->name }}</a>
+                                                <span class="comment-time">{{ $nestedReply->created_at->diffForHumans() }}</span>
+                                            </div>
+                                            <p class="comment-text">{{ $nestedReply->content }}</p>
+                                            
+                                            <!-- Reply Button for Nested Replies -->
+                                            <button class="btn btn-link reply-btn" data-comment-id="{{ $nestedReply->id }}">Reply</button>
+
+                                            <!-- Reply Input Field for Nested Replies -->
+                                            <div class="reply-form" id="reply-form-{{ $nestedReply->id }}" style="display: none; margin-top: 0.5rem;">
+                                                <form action="{{ route('comments.reply', $nestedReply->id) }}" method="POST">
+                                                    @csrf
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" placeholder="Write a reply..." name="reply">
+                                                        <button type="submit" class="btn btn-primary">
+                                                            <i class="fas fa-paper-plane"></i>
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @endforeach
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                    @endif
                 </div>
             </div>
             @endforeach
@@ -619,6 +695,50 @@
             const replyForm = $(`#reply-form-${commentId}`);
 
             replyForm.toggle();
+        });
+
+        // Handle reply form submission
+        $('.reply-form form').on('submit', function(e) {
+            e.preventDefault();
+            const $form = $(this);
+            const commentId = $form.closest('.reply-form').attr('id').split('-')[2];
+            const $input = $form.find('input[name="reply"]');
+            const reply = $input.val().trim();
+
+            if (!reply) return;
+
+            $.ajax({
+                url: `/comments/${commentId}/reply`,
+                method: 'POST',
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content'),
+                    reply: reply
+                },
+                success: function(response) {
+                    
+                    const newReply = `
+                        <div class="comment reply">
+                            <img src="${response.user.profile_picture && response.user.profile_picture !== null ? '/storage/' + response.user.profile_picture : '/images/default-avatar.png'}" 
+                                 alt="${response.user.name}" class="comment-avatar">
+                            <div class="comment-content">
+                                <div class="comment-header">
+                                    <a href="/profile/${response.user.id}" class="comment-username">${response.user.name}</a>
+                                    <span class="comment-time">Just now</span>
+                                </div>
+                                <p class="comment-text">${reply}</p>
+                            </div>
+                        </div>
+                    `;
+                    $form.closest('.comment-content').append(newReply);
+
+                    // Clear input and hide form
+                    $input.val('');
+                    $form.closest('.reply-form').hide();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error:', error);
+                }
+            });
         });
     });
 </script>

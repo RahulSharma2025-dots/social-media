@@ -152,6 +152,24 @@
         .social-btn.twitter {
             background-color: #1da1f2;
         }
+
+        /* Password Toggle Styles */
+        .password-toggle {
+            cursor: pointer;
+            padding: 0.375rem 0.75rem;
+            background: transparent;
+            border: none;
+            color: #6c757d;
+            transition: color 0.3s ease;
+        }
+
+        .password-toggle:hover {
+            color: var(--primary-color);
+        }
+
+        .input-group .password-toggle {
+            border-left: 1px solid var(--border-color);
+        }
     </style>
 </head>
 <body>
@@ -198,6 +216,10 @@
     
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- jQuery Validation Plugin -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.20.0/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.20.0/additional-methods.min.js"></script>
     
     @stack('scripts')
 </body>
