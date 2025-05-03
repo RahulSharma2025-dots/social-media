@@ -16,29 +16,16 @@ class MessageController extends Controller
             ->latest()
             ->get()
             ->groupBy(function ($message) {
-                return $message->sender_id === auth()->id() 
-                    ? $message->receiver_id 
+                return $message->sender_id === auth()->id()
+                    ? $message->receiver_id
                     : $message->sender_id;
             });
 
-        return view('messages.index', compact('conversations'));
-    }
-
-    public function show(User $user)
-    {
-        $messages = Message::where(function ($query) use ($user) {
-                $query->where('sender_id', auth()->id())
-                    ->where('receiver_id', $user->id);
-            })
-            ->orWhere(function ($query) use ($user) {
-                $query->where('sender_id', $user->id)
-                    ->where('receiver_id', auth()->id());
-            })
-            ->with(['sender', 'receiver'])
-            ->latest()
-            ->get();
-
-        return view('messages.show', compact('messages', 'user'));
+        $users = User::whereIn('id', $conversations->keys())
+            ->where('id', '!=', auth()->id())
+            ->get()
+            ->keyBy('id');
+        return view('messages.index', compact('conversations', 'users'));
     }
 
     public function store(Request $request, User $user)
@@ -46,13 +33,36 @@ class MessageController extends Controller
         $request->validate([
             'message' => 'required|string|max:1000',
         ]);
-
-        Message::create([
+    
+        $message = Message::create([
             'sender_id' => auth()->id(),
             'receiver_id' => $user->id,
             'message' => $request->message,
         ]);
-
-        return back()->with('success', 'Message sent successfully!');
+    
+        return response()->json([
+            'data' => $message,
+            'user' => $user,
+        ]);
     }
-} 
+
+
+    public function fetchMessages(User $user)
+    {
+        $messages = Message::where(function ($query) use ($user) {
+            $query->where('sender_id', auth()->id())
+                ->where('receiver_id', $user->id);
+        })
+            ->orWhere(function ($query) use ($user) {
+                $query->where('sender_id', $user->id)
+                    ->where('receiver_id', auth()->id());
+            })
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        return response()->json([
+            'messages' => $messages,
+            'user' => $user,
+        ]);
+    }
+}

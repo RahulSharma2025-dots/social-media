@@ -23,7 +23,7 @@ class UserController extends Controller
                 ->take(10)
                 ->get();
 
-            return view('explore', compact('trendingPosts', 'suggestedUsers', 'trendingTopics'));
+            return view('explore', compact('trendingPosts'));
         } catch (\Exception $e) {
             \Log::error('Explore page error: ' . $e->getMessage());
             return back()->with('error', 'Failed to load explore page. Please try again.');

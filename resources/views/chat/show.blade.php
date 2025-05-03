@@ -49,10 +49,10 @@
 
             <!-- Messages -->
             <div class="flex-1 p-4 overflow-y-auto bg-gray-50" 
-                 id="messages-container"
-                 data-user-id="{{ auth()->id() }}"
-                 data-auth-id="{{ auth()->id() }}"
-                 data-mark-read-url="{{ route('chat.markAsRead', $user) }}">
+                id="messages-container"
+                data-user-id="{{ auth()->id() }}"
+                data-auth-id="{{ auth()->id() }}"
+                data-mark-read-url="{{ route('chat.markAsRead', $user) }}">
                 @foreach($messages as $message)
                     <div class="mb-4 {{ $message->sender_id === auth()->id() ? 'text-right' : 'text-left' }}">
                         <div class="inline-block p-3 rounded-lg {{ $message->sender_id === auth()->id() ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800' }}">

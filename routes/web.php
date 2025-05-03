@@ -62,7 +62,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Messages Routes
     Route::get('/messages', [MessageController::class, 'index'])->name('messages');
-    Route::get('/messages/{user}', [MessageController::class, 'show'])->name('messages.show');
+    Route::get('/messages/{user}', [MessageController::class, 'fetchMessages'])->name('messages.fetch');
     Route::post('/messages/{user}', [MessageController::class, 'store'])->name('messages.store');
 
     // Notifications Routes
