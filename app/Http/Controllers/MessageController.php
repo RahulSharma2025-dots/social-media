@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Message;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class MessageController extends Controller
 {
@@ -64,5 +65,15 @@ class MessageController extends Controller
             'messages' => $messages,
             'user' => $user,
         ]);
+    }
+
+    public function markAsRead(User $user)
+    {
+        Message::where('sender_id', $user->id)
+            ->where('receiver_id', Auth::id())
+            ->where('is_read', false)
+            ->update(['is_read' => true]);
+
+        return response()->json(['status' => 'success']);
     }
 }

@@ -72,7 +72,7 @@
         <header class="message-chat-header" id="chat-header">
             <div class="text-center text-muted">No conversation selected</div>
         </header>
-        <section class="message-chat-body flex-grow-1" id="chat-body">
+        <section class="message-chat-body flex-grow-1" id="chat-body" data-mark-read-url="{{ route('messages.markAsRead', $user) }}" data-user-id="{{ auth()->id() }}">
             <div class="no-conversation text-center text-muted">
                 Select a user to start a conversation.
             </div>
@@ -176,13 +176,13 @@
                             <span class="message-status ${data.user.is_online ? 'online' : 'offline'}">${data.user.is_online ? 'Online' : 'Offline'}</span>
                         </div>
                     `);
-
                     // Update chat body
                     if (data.messages.length > 0) {
                         
                         let messagesHtml = '';
+                        const authUserId = {{ auth()->id() }};
                         data.messages.forEach(function(message) {
-                            const messageClass = message.sender_id === {{auth()->id()}} ? 'sent' : 'received';
+                            const messageClass = message.sender_id === authUserId ? 'sent' : 'received';
                             messagesHtml += `
                             <div class="message-bubble ${messageClass}">
                                 <div class="message-content">${message.message}</div>
@@ -217,7 +217,7 @@
                                     message: message
                                 }),
                                 success: function(newMessage) {
-                                    
+
                                     const messageClass = 'sent';
                                     chatBody.append(`
                                     <div class="message-bubble ${messageClass}">
@@ -242,6 +242,8 @@
             });
         });
 
+        // Scroll to bottom of messages
+        chatFooter.scrollTop(chatFooter[0].scrollHeight);
         // messageInput.on('input', function() {
         //     clearTimeout(typingTimeout);
         //     $typingIndicator.show();
@@ -253,18 +255,18 @@
 
 
         // Listen for new messages
-        // Echo.private(`chat.${messageContainer.data('user-id')}`)
-        //     .listen('NewMessage', function(e) {
-        //         appendMessage(e.message);
-        //         // Mark message as read
-        //         $.ajax({
-        //             url: messageContainer.data('mark-read-url'),
-        //             method: 'POST',
-        //             headers: {
-        //                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        //             }
-        //         });
-        //     });
+        Echo.private(`chat.${$(messageContainer).data('user-id')}`)
+            .listen('NewMessage', function(e) {
+                appendMessage(e.message);
+                // Mark message as read
+                $.ajax({
+                    url: $(messageContainer).data('mark-read-url'),
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+                });
+            });
     });
 </script>
 @endsection
