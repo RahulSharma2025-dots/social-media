@@ -7,7 +7,7 @@
     <!-- Left Sidebar -->
     <aside class="message-sidebar d-flex flex-column" style="min-width: 320px; max-width: 350px; border-left: 1px solid #e5e7eb; background: #fff;">
         <div class="message-sidebar-header">
-            <h6 class="mb-3">Active Now</h6>
+            <h6 class="mb-3">Messages</h6>
         </div>
         <div class="message-sidebar-content flex-grow-1 overflow-auto">
             <div class="message-list">
@@ -33,36 +33,6 @@
                     </a>
                     @endforeach
                 </div>
-                <!-- <div class="d-flex align-items-center mb-3">
-                    <div class="position-relative">
-                        <img src="{{ asset('images/woman.jpg') }}" class="message-avatar" alt="Sarah Johnson">
-                        <span class="online-status" style="bottom: 4px; right: 4px;"></span>
-                    </div>
-                    <div class="ms-3">
-                        <div class="fw-bold">Sarah Johnson</div>
-                        <div class="text-success small">Online</div>
-                    </div>
-                </div> -->
-                <!-- <div class="d-flex align-items-center mb-3">
-                    <div class="position-relative">
-                        <img src="{{ asset('images/man.jpg') }}" class="message-avatar" alt="John Smith">
-                        <span class="online-status" style="bottom: 4px; right: 4px;"></span>
-                    </div>
-                    <div class="ms-3">
-                        <div class="fw-bold">John Smith</div>
-                        <div class="text-success small">Online</div>
-                    </div>
-                </div>
-                <div class="d-flex align-items-center mb-3">
-                    <div class="position-relative">
-                        <img src="{{ asset('images/man.jpg') }}" class="message-avatar" alt="Mike Wilson">
-                        <span class="online-status" style="bottom: 4px; right: 4px;"></span>
-                    </div>
-                    <div class="ms-3">
-                        <div class="fw-bold">Mike Wilson</div>
-                        <div class="text-success small">Online</div>
-                    </div>
-                </div> -->
             </div>
         </div>
     </aside>
@@ -72,15 +42,15 @@
         <header class="message-chat-header" id="chat-header">
             <div class="text-center text-muted">No conversation selected</div>
         </header>
-        <section class="message-chat-body flex-grow-1" id="chat-body" data-mark-read-url="{{ route('messages.markAsRead', $user) }}" data-user-id="{{ auth()->id() }}">
+        <section class="message-chat-body flex-grow-1" id="chat-body">
             <div class="no-conversation text-center text-muted">
                 Select a user to start a conversation.
             </div>
         </section>
         <footer class="message-chat-footer" id="chat-footer" style="display: none;">
-            <form autocomplete="off" id="message-form">
+            <form autocomplete="off" id="message-form" data-mark-read-url="{{ route('messages.markAsRead', $user) }}" data-user-id="{{ auth()->id() }}">
                 <div class="message-input-group">
-                    <button type="button" class="message-action-btn" title="Add Emoji"><i class="far fa-smile"></i></button>
+                    <!-- <button type="button" class="message-action-btn" title="Add Emoji"><i class="far fa-smile"></i></button> -->
                     <input type="text" class="message-input" id="message-input" placeholder="Type your message..." required>
                     <!-- <button type="button" class="message-action-btn" title="Attach File"><i class="fas fa-paperclip"></i></button> -->
                     <button type="submit" class="message-send-btn" title="Send Message"><i class="fas fa-paper-plane"></i></button>
@@ -88,56 +58,6 @@
             </form>
         </footer>
     </main>
-    <!-- <main class="message-container flex-grow-1 d-flex flex-column">
-        <header class="message-chat-header">
-            <img src="{{ asset('images/woman.jpg') }}" alt="Sarah Johnson" class="message-avatar">
-            <div>
-                <h5 class="mb-0">Sarah Johnson</h5>
-                <span class="message-status online">Online</span>
-            </div>
-            <div class="message-actions ms-auto">
-                <button class="message-action-btn" title="Voice Call"><i class="fas fa-phone"></i></button>
-                <button class="message-action-btn" title="Video Call"><i class="fas fa-video"></i></button>
-                <button class="message-action-btn" title="More Options"><i class="fas fa-ellipsis-v"></i></button>
-            </div>
-        </header>
-        <section class="message-chat-body flex-grow-1">
-            <div class="message-bubble received">
-                <div class="message-content">
-                    Hi Emma! I really enjoyed your latest tech review video. I have some questions about the smartphone you featured.
-                </div>
-                <div class="message-time">10:30 AM</div>
-            </div>
-            <div class="message-bubble sent">
-                <div class="message-content">
-                    Thank you, Sarah! I'm glad you found it helpful. What would you like to know?
-                </div>
-                <div class="message-time">10:32 AM</div>
-            </div>
-            <div class="message-bubble received">
-                <div class="message-content">
-                    Could you tell me more about the camera features? I'm particularly interested in night mode photography.
-                </div>
-                <div class="message-time">10:33 AM</div>
-            </div>
-            <div class="message-bubble sent">
-                <div class="message-content">
-                    Of course! The night mode is exceptional. Would you like to schedule a one-on-one session where I can show you all the camera features in detail?
-                </div>
-                <div class="message-time">10:35 AM</div>
-            </div>
-        </section>
-        <footer class="message-chat-footer">
-            <form autocomplete="off">
-                <div class="message-input-group">
-                    <button type="button" class="message-action-btn" title="Add Emoji"><i class="far fa-smile"></i></button>
-                    <input type="text" class="message-input" placeholder="Type your message..." required>
-                    <button type="button" class="message-action-btn" title="Attach File"><i class="fas fa-paperclip"></i></button>
-                    <button type="submit" class="message-send-btn" title="Send Message"><i class="fas fa-paper-plane"></i></button>
-                </div>
-            </form>
-        </footer>
-    </main> -->
 </div>
 @endsection
 
@@ -155,6 +75,7 @@
         const chatFooter = $('#chat-footer');
         const messageForm = $('#message-form');
         const messageInput = $('#message-input');
+        const authUserId = {{ auth()->id() }};
 
         $('.user-link').on('click', function() {
             const userId = $(this).data('user-id');
@@ -178,9 +99,8 @@
                     `);
                     // Update chat body
                     if (data.messages.length > 0) {
-                        
+
                         let messagesHtml = '';
-                        const authUserId = {{ auth()->id() }};
                         data.messages.forEach(function(message) {
                             const messageClass = message.sender_id === authUserId ? 'sent' : 'received';
                             messagesHtml += `
@@ -220,16 +140,26 @@
 
                                     const messageClass = 'sent';
                                     chatBody.append(`
-                                    <div class="message-bubble ${messageClass}">
-                                        <div class="message-content">${newMessage.data.message}</div>
-                                        <div class="message-time">${new Date(newMessage.data.created_at).toLocaleTimeString()}</div>
-                                    </div>
-                                `);
+                                        <div class="message-bubble ${messageClass}">
+                                            <div class="message-content">${newMessage.data.message}</div>
+                                            <div class="message-time">${new Date(newMessage.data.created_at).toLocaleTimeString()}</div>
+                                        </div>
+                                    `);
                                     chatBody.scrollTop(chatBody.prop('scrollHeight'));
                                     messageInput.val('');
+
+                                    // Show success toaster
+                                    // toastr.success('Message sent successfully!');
                                 },
                                 error: function(error) {
                                     console.error('Error sending message:', error);
+
+                                    // Check for validation error
+                                    if (error.responseJSON && error.responseJSON.errors && error.responseJSON.errors.message) {
+                                        toastr.error(error.responseJSON.errors.message[0]);
+                                    } else {
+                                        toastr.error('Failed to send the message. Please try again.');
+                                    }
                                 }
                             });
                         }
@@ -255,18 +185,42 @@
 
 
         // Listen for new messages
-        Echo.private(`chat.${$(messageContainer).data('user-id')}`)
+        Echo.private(`chat.${authUserId}`)
             .listen('NewMessage', function(e) {
+                console.log('Received event:', e);
+                
                 appendMessage(e.message);
                 // Mark message as read
                 $.ajax({
-                    url: $(messageContainer).data('mark-read-url'),
+                    url: $messageForm.data('mark-read-url'),
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     }
                 });
             });
+
+
+        // Append a new message to the container
+        function appendMessage(message) {
+            const messageHtml = `
+            <div class="mb-4 ${message.sender_id === $messagesContainer.data('auth-id') ? 'text-right' : 'text-left'}">
+                <div class="inline-block p-3 rounded-lg ${message.sender_id === $messagesContainer.data('auth-id') ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}">
+                    <p class="text-sm">${message.message}</p>
+                    <p class="text-xs mt-1 ${message.sender_id === $messagesContainer.data('auth-id') ? 'text-blue-100' : 'text-gray-500'}">
+                        ${new Date(message.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                        ${message.sender_id === $messagesContainer.data('auth-id') ? `
+                            <span class="ml-1">
+                                ${message.is_read ? '✓✓' : '✓'}
+                            </span>
+                        ` : ''}
+                    </p>
+                </div>
+            </div>
+        `;
+            $messagesContainer.append(messageHtml);
+            $messagesContainer.scrollTop($messagesContainer[0].scrollHeight);
+        }
     });
 </script>
 @endsection
