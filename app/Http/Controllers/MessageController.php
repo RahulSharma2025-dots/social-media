@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NewMessage;
 use App\Models\User;
 use App\Models\Message;
 use Illuminate\Http\Request;
@@ -22,10 +23,17 @@ class MessageController extends Controller
                     : $message->sender_id;
             });
 
-        $users = User::whereIn('id', $conversations->keys())
-            ->where('id', '!=', auth()->id())
+        // $users = User::whereIn('id', $conversations->keys())
+        $users = User::where('id', '!=', auth()->id())
             ->get()
             ->keyBy('id');
+
+        $users->transform(function ($user) {
+            $user->is_online = $user->is_online;
+            return $user;
+        });
+
+
         return view('messages.index', compact('conversations', 'users'));
     }
 
@@ -34,13 +42,16 @@ class MessageController extends Controller
         $request->validate([
             'message' => 'required|string|max:1000',
         ]);
-    
+
         $message = Message::create([
             'sender_id' => auth()->id(),
             'receiver_id' => $user->id,
             'message' => $request->message,
         ]);
-    
+
+        // Broadcast the event
+        broadcast(new NewMessage($message))->toOthers();
+
         return response()->json([
             'data' => $message,
             'user' => $user,

@@ -13,7 +13,7 @@ use Illuminate\Queue\SerializesModels;
 
 class NewMessage implements ShouldBroadcast
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use InteractsWithSockets, SerializesModels;
 
     public $message;
 

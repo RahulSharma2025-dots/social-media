@@ -48,7 +48,7 @@
             </div>
 
             <!-- Messages -->
-            <div class="flex-1 p-4 overflow-y-auto bg-gray-50" 
+            <div class="flex-1 p-4 bg-gray-50" 
                 id="messages-container"
                 data-user-id="{{ auth()->id() }}"
                 data-auth-id="{{ auth()->id() }}"
