@@ -64,6 +64,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/messages', [MessageController::class, 'index'])->name('messages');
     Route::get('/messages/{user}', [MessageController::class, 'fetchMessages'])->name('messages.fetch');
     Route::post('/messages/{user}', [MessageController::class, 'store'])->name('messages.store');
+    Route::post('/messages/{user}/read', [MessageController::class, 'markAsRead'])->name('messages.markAsRead');
 
     // Notifications Routes
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications');
