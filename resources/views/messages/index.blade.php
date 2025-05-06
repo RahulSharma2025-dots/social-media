@@ -47,6 +47,9 @@
                 Select a user to start a conversation.
             </div>
         </section>
+        <div id="typing-indicator" class="text-muted small" style="display: none;">
+            The user is typing...
+        </div>
         <footer class="message-chat-footer" id="chat-footer" style="display: none;">
             <form autocomplete="off" id="message-form" data-mark-read-url="{{ route('messages.markAsRead', $user) }}" data-user-id="{{ auth()->id() }}">
                 <div class="message-input-group">
@@ -76,7 +79,6 @@
         const messageForm = $('#message-form');
         const messageInput = $('#message-input');
         const authUserId = {{ auth()->id() }};
-
         $('.user-link').on('click', function() {
             const userId = $(this).data('user-id');
 
@@ -129,15 +131,12 @@
                             $.ajax({
                                 url: `/messages/${userId}`,
                                 method: 'POST',
-                                headers: {
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                },
+                                headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
                                 contentType: 'application/json',
                                 data: JSON.stringify({
                                     message: message
                                 }),
                                 success: function(newMessage) {
-
                                     const messageClass = 'sent';
                                     chatBody.append(`
                                         <div class="message-bubble ${messageClass}">
@@ -147,13 +146,10 @@
                                     `);
                                     chatBody.scrollTop(chatBody.prop('scrollHeight'));
                                     messageInput.val('');
-
-                                    // Show success toaster
                                     // toastr.success('Message sent successfully!');
                                 },
                                 error: function(error) {
                                     console.error('Error sending message:', error);
-
                                     // Check for validation error
                                     if (error.responseJSON && error.responseJSON.errors && error.responseJSON.errors.message) {
                                         toastr.error(error.responseJSON.errors.message[0]);
@@ -174,52 +170,56 @@
 
         // Scroll to bottom of messages
         chatFooter.scrollTop(chatFooter[0].scrollHeight);
-        // messageInput.on('input', function() {
-        //     clearTimeout(typingTimeout);
-        //     $typingIndicator.show();
+        
+        let typingTimeout;
+        messageInput.on('input', function () {
+            clearTimeout(typingTimeout);
 
-        //     typingTimeout = setTimeout(function() {
-        //         $typingIndicator.hide();
-        //     }, 1000);
-        // });
+            // Broadcast the typing event
+            Echo.private(`chat.${authUserId}`).whisper('typing', {
+                sender_id: authUserId,
+            });
 
+            // Hide the typing indicator after 1 second of inactivity
+            typingTimeout = setTimeout(function () {
+                Echo.private(`chat.${authUserId}`).whisper('stopTyping', {
+                    sender_id: authUserId,
+                });
+            }, 1000);
+        });
 
         // Listen for new messages
         Echo.private(`chat.${authUserId}`)
-            .listen('NewMessage', function(e) {
-                console.log('Received event:', e);
-                
-                appendMessage(e.message);
-                // Mark message as read
-                $.ajax({
-                    url: $messageForm.data('mark-read-url'),
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    }
-                });
-            });
+        .listen('NewMessage', function (e) {
+            console.log('Received event:', e);
+            appendMessage(e.message);
+
+            // Scroll to the bottom of the chat
+            chatBody.scrollTop(chatBody.prop('scrollHeight'));
+        })
+        .listenForWhisper('typing', function (e) {
+            console.log('User is typing:', e.sender_id);
+            $('#typing-indicator').show(); // Show the typing indicator
+        })
+        .listenForWhisper('stopTyping', function (e) {
+            console.log('User stopped typing:', e.sender_id);
+            $('#typing-indicator').hide(); // Hide the typing indicator
+        });
 
 
         // Append a new message to the container
         function appendMessage(message) {
+            console.log('Appending message:', message);
+            
+            const messageClass = message.sender_id === authUserId ? 'sent' : 'received';
             const messageHtml = `
-            <div class="mb-4 ${message.sender_id === $messagesContainer.data('auth-id') ? 'text-right' : 'text-left'}">
-                <div class="inline-block p-3 rounded-lg ${message.sender_id === $messagesContainer.data('auth-id') ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}">
-                    <p class="text-sm">${message.message}</p>
-                    <p class="text-xs mt-1 ${message.sender_id === $messagesContainer.data('auth-id') ? 'text-blue-100' : 'text-gray-500'}">
-                        ${new Date(message.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-                        ${message.sender_id === $messagesContainer.data('auth-id') ? `
-                            <span class="ml-1">
-                                ${message.is_read ? '✓✓' : '✓'}
-                            </span>
-                        ` : ''}
-                    </p>
+                <div class="message-bubble ${messageClass}">
+                    <div class="message-content">${message.message}</div>
+                    <div class="message-time">${new Date(message.created_at).toLocaleTimeString()}</div>
                 </div>
-            </div>
-        `;
-            $messagesContainer.append(messageHtml);
-            $messagesContainer.scrollTop($messagesContainer[0].scrollHeight);
+            `;
+            chatBody.append(messageHtml);
+            chatBody.scrollTop(chatBody.prop('scrollHeight'));
         }
     });
 </script>

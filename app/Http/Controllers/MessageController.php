@@ -42,13 +42,12 @@ class MessageController extends Controller
         $request->validate([
             'message' => 'required|string|max:1000',
         ]);
-
         $message = Message::create([
             'sender_id' => auth()->id(),
             'receiver_id' => $user->id,
             'message' => $request->message,
         ]);
-
+       
         // Broadcast the event
         broadcast(new NewMessage($message))->toOthers();
 
