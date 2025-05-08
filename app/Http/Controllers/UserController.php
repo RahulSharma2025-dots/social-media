@@ -33,6 +33,7 @@ class UserController extends Controller
     public function follow(User $user)
     {
         try {
+            // dd($user->id);
             if ($user->id === auth()->id()) {
                 return back()->with('error', 'You cannot follow yourself.');
             }
@@ -48,10 +49,12 @@ class UserController extends Controller
     public function unfollow(User $user)
     {
         try {
-            auth()->user()->following()->detach($user->id);
+            $authUser = auth()->user();
+            $authUser->following()->detach($user->id);
+
             return back()->with('success', 'You have unfollowed ' . $user->name);
         } catch (\Exception $e) {
-            \Log::error('Unfollow action failed: ' . $e->getMessage());
+            Log::error('Unfollow action failed: ' . $e->getMessage());
             return back()->with('error', 'Failed to unfollow user. Please try again.');
         }
     }

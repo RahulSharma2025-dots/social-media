@@ -22,16 +22,16 @@
             <h5 class="mb-3">Suggested Users</h5>
             @foreach($suggestedUsers as $user)
                 <div class="suggested-user">
-                    <img src="{{ $user->profile_picture ? asset('storage/'.$user->profile_picture) : asset('images/default-avatar.png') }}" 
-                         alt="{{ $user->name }}" class="user-avatar">
+                    <img src="{{ $user->profile_picture ? asset('storage/'.$user->profile_picture) : asset('images/default-avatar.png') }}" alt="{{ $user->name }}" class="user-avatar">
                     <div class="user-details">
                         <a href="{{ route('profile', $user) }}" class="user-name">{{ $user->name }}</a>
                         <div class="user-bio">{{ $user->bio }}</div>
                     </div>
-                    <form action="{{ route('users.follow', $user) }}" method="POST" class="d-inline">
+                    <a href="{{ route('users.follow',[$user->id]) }}">Follow</a>
+                    <!-- <form action="{{ route('users.follow', $user) }}" method="POST" class="d-inline">
                         @csrf
                         <button type="submit" class="follow-btn">Follow</button>
-                    </form>
+                    </form> -->
                 </div>
             @endforeach
         </div>
@@ -53,4 +53,10 @@
         </div>
     </div>
 </div>
-@endsection 
+@endsection
+
+@section('scripts')
+<script>
+    
+</script>
+@endsection

@@ -19,6 +19,7 @@ use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\WebhookController;
 
 // Regular user authentication routes
 Auth::routes();
@@ -57,14 +58,15 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/wallet/withdraw', [WalletController::class, 'withdraw'])->name('wallet.withdraw');
 
     // User Routes
-    Route::post('/users/{user}/follow', [AppUserController::class, 'follow'])->name('users.follow');
     Route::get('/explore', [AppUserController::class, 'explore'])->name('explore');
+    Route::get('/users/{user}/follow', [AppUserController::class, 'follow'])->name('users.follow');
+    Route::get('/users/{user}/unfollow', [AppUserController::class, 'unfollow'])->name('users.unfollow');
 
     // Messages Routes
     Route::get('/messages', [MessageController::class, 'index'])->name('messages');
     Route::get('/messages/{user}', [MessageController::class, 'fetchMessages'])->name('messages.fetch');
     Route::post('/messages/{user}', [MessageController::class, 'store'])->name('messages.store');
-    Route::post('/messages/{user}/read', [MessageController::class, 'markAsRead'])->name('messages.markAsRead');
+    Route::post('/messages/{user}/mark-as-read', [MessageController::class, 'markAsRead'])->name('messages.markAsRead');
 
     // Notifications Routes
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications');
@@ -87,6 +89,12 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
 Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
 Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+
+// followers and following routes
+Route::get('/profile/{user}/{type}', [ProfileController::class, 'followersAndFollowing'])->where('type', 'followers|following')->name('profile.followers_and_following');
+
+//follow/unfollow user profile route
+Route::get('/profile/{user}', [ProfileController::class, 'showProfile'])->name('profile.show');
 
 // Settings Route
 Route::get('/settings', [ProfileController::class, 'settings'])->name('settings');
@@ -116,7 +124,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('users/{user}/unban', [UserController::class, 'unbanUser'])->name('admin.users.unban');
     });
 });
-
+Route::post('/webhook/pusher', [WebhookController::class, 'handlePusherWebhook']);
 // Authentication Routes
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);

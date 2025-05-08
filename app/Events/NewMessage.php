@@ -9,8 +9,6 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
-use function Illuminate\Log\log;
-
 class NewMessage implements ShouldBroadcast
 {
     use InteractsWithSockets, SerializesModels;
@@ -29,8 +27,15 @@ class NewMessage implements ShouldBroadcast
 
     public function broadcastWith()
     {
-        return [
-            'message' => $this->message->load('sender'),
-        ];
+        try {
+            return [
+                'message' => $this->message->load('sender'),
+            ];
+        } catch (\Exception $e) {
+            Log::error('Error in NewMessage@broadcastWith: ' . $e->getMessage());
+            return [
+                'error' => 'Failed to load message data',
+            ];
+        }
     }
 } 

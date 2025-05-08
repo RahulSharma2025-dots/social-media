@@ -42,7 +42,7 @@
         <header class="message-chat-header" id="chat-header">
             <div class="text-center text-muted">No conversation selected</div>
         </header>
-        <section class="message-chat-body flex-grow-1" id="chat-body">
+        <section class="message-chat-body flex-grow-1" id="chat-body" data-mark-read-url="{{ route('messages.markAsRead', $user) }}" data-user-id="{{ auth()->id() }}">
             <div class="no-conversation text-center text-muted">
                 Select a user to start a conversation.
             </div>
@@ -51,7 +51,7 @@
             The user is typing...
         </div>
         <footer class="message-chat-footer" id="chat-footer" style="display: none;">
-            <form autocomplete="off" id="message-form" data-mark-read-url="{{ route('messages.markAsRead', $user) }}" data-user-id="{{ auth()->id() }}">
+            <form autocomplete="off" id="message-form">
                 <div class="message-input-group">
                     <!-- <button type="button" class="message-action-btn" title="Add Emoji"><i class="far fa-smile"></i></button> -->
                     <input type="text" class="message-input" id="message-input" placeholder="Type your message..." required>
@@ -123,6 +123,19 @@
                     // Scroll to the bottom of the chat
                     chatBody.scrollTop(chatBody.prop('scrollHeight'));
 
+                    // Mark messages as read
+                    $.ajax({
+                        url: `/messages/${userId}/mark-as-read`,
+                        method: 'POST',
+                        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                        success: function () {
+                            console.log('Messages marked as read.');
+                        },
+                        error: function (error) {
+                            console.error('Error marking messages as read:', error);
+                        }
+                    });
+
                     // Handle message sending
                     messageForm.off('submit').on('submit', function(e) {
                         e.preventDefault();
@@ -176,13 +189,13 @@
             clearTimeout(typingTimeout);
 
             // Broadcast the typing event
-            Echo.private(`chat.${authUserId}`).whisper('typing', {
+            Echo.private(`chat.${userId}`).whisper('typing', {
                 sender_id: authUserId,
             });
 
             // Hide the typing indicator after 1 second of inactivity
             typingTimeout = setTimeout(function () {
-                Echo.private(`chat.${authUserId}`).whisper('stopTyping', {
+                Echo.private(`chat.${userId}`).whisper('stopTyping', {
                     sender_id: authUserId,
                 });
             }, 1000);

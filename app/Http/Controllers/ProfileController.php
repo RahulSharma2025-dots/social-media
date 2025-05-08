@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Post;
 use App\Models\LiveSession;
 use App\Models\OneOnOneSession;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
@@ -19,6 +20,8 @@ class ProfileController extends Controller
     public function show()
     {
         $user = auth()->user();
+        $followersCount = $user->followers()->count();
+        $followingCount = $user->following()->count();
         $posts = Post::where('user_id', $user->id)
             ->with(['user', 'likes', 'comments'])
             ->latest()
@@ -42,8 +45,31 @@ class ProfileController extends Controller
                 ->latest()
                 ->paginate(10);
         }
+        $posts->load('media');
+        // dd($posts->toArray());
+        return view('profile.show', compact('user', 'posts', 'isFollowing', 'upcomingSessions', 'sessions', 'followersCount', 'followingCount','posts'));
+    }
 
-        return view('profile.show', compact('user', 'posts', 'isFollowing', 'upcomingSessions', 'sessions'));
+    /** 
+     * Display the profile of a follower or following user.
+    */
+    public function showProfile($userId)
+    {
+        try {
+            $user = User::with(['posts.media', 'followers', 'following'])->findOrFail($userId);
+
+            return view('profile.profile_show', [
+                'user' => $user,
+                'posts' => $user->posts,
+                'followersCount' => $user->followers->count(),
+                'followingCount' => $user->following->count(),
+                'bio' => $user->bio,
+                'title' => $user->name . "'s Profile",
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error fetching user profile: ' . $e->getMessage());
+            return redirect()->route('home')->with('error', 'User profile not found.');
+        }
     }
 
     public function edit()
@@ -54,29 +80,34 @@ class ProfileController extends Controller
 
     public function update(Request $request)
     {
-        $user = auth()->user();
-        
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'username' => 'required|string|max:255|unique:users,username,' . $user->id,
-            'bio' => 'nullable|string|max:1000',
-            'profile_picture' => 'nullable|image|max:2048'
-        ]);
+        try {
+            $user = auth()->user();
 
-        if ($request->hasFile('profile_picture')) {
-            // Delete old profile image if exists
-            if ($user->profile_picture) {
-                Storage::disk('public')->delete($user->profile_picture);
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'username' => 'required|string|max:255|unique:users,username,' . $user->id,
+                'bio' => 'nullable|string|max:1000',
+                'profile_picture' => 'nullable|image|max:2048'
+            ]);
+            if ($request->hasFile('profile_picture')) {
+                if ($user->profile_picture) {
+                    Storage::disk('public')->delete($user->profile_picture);
+                }
+
+                $path = $request->file('profile_picture')->store('profile-images', 'public');
+                $validated['profile_picture'] = $path;
             }
-            
-            // Store new profile image
-            $path = $request->file('profile_picture')->store('profile-images', 'public');
-            $validated['profile_picture'] = $path;
+
+            $user->update($validated);
+
+            return redirect()->route('profile')->with('success', 'Profile updated successfully');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()->withErrors($e->validator)->withInput();
+        } catch (\Exception $e) {
+            Log::error('Error updating profile: ' . $e->getMessage());
+    
+            return redirect()->back()->with('error', 'An error occurred while updating the profile.');
         }
-
-        $user->update($validated);
-
-        return redirect()->route('profile')->with('success', 'Profile updated successfully');
     }
 
     public function settings()
@@ -88,7 +119,6 @@ class ProfileController extends Controller
     public function updateSettings(Request $request)
     {
         $user = auth()->user();
-        
         $validated = $request->validate([
             'email' => 'required|email|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:8|confirmed',
@@ -105,4 +135,25 @@ class ProfileController extends Controller
 
         return redirect()->route('settings')->with('success', 'Settings updated successfully');
     }
-} 
+
+    public function followersAndFollowing(User $user, $type)
+    {
+        try {
+            if ($type === 'followers') {
+                $users = $user->followers()->paginate(10);
+                $title = "{$user->name}'s Followers";
+            } elseif ($type === 'following') {
+                $users = $user->following()->paginate(10);
+                $title = "{$user->name}'s Following";
+            } else {
+                abort(404);
+            }
+
+            return view('profile.followers_and_following', compact('user', 'users', 'title', 'type'));
+        } catch (\Exception $e) {
+            Log::error('Error fetching followers or following: ' . $e->getMessage());
+    
+            return redirect()->route('home')->with('error', 'Unable to fetch followers or following.');
+        }   
+    }
+}

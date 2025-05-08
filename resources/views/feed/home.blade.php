@@ -227,7 +227,7 @@
     <div class="post-header">
         <img src="{{ $post->user->profile_picture ? asset('storage/'.$post->user->profile_picture) : asset('images/default-avatar.png') }}" alt="{{ $post->user->name }}" class="post-avatar">
         <div class="user-info">
-            <a href="{{ route('profile', $post->user) }}" class="username">{{ $post->user->name }}</a>
+            <a href="{{ auth()->id() === $post->user->id ? route('profile') : route('profile.show', $post->user) }}" class="username">{{ $post->user->name }}</a>
             <div class="post-time">{{ $post->created_at->diffForHumans() }}</div>
         </div>
     </div>
