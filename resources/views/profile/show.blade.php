@@ -16,6 +16,7 @@
             <div>
                 <h4 class="mb-0">{{ Auth::user()->name ?? 'N/A' }}</h4>
                 <div class="text-muted mb-1" style="font-size: 1.05em;">{{ '@'.Auth::user()->username ?? 'N/A' }}</div>
+                <span>{{ $categoryName }}</span>
             </div>
             <div class="d-flex">
                 <a href="{{ route('profile.followers_and_following', ['user' => $user->id, 'type' => 'followers']) }}" class="text-muted mb-1" style="font-size: 1.05em;">
@@ -236,7 +237,7 @@
                 @endforeach
             </div>
 
-            <div class="tab-pane fade" id="pills-media" role="tabpanel" aria-labelledby="pills-media-tab" tabindex="0"> 
+            <div class="tab-pane fade" id="pills-media" role="tabpanel" aria-labelledby="pills-media-tab" tabindex="0">
                 <h2>Media Tab</h2>
             </div>
 
@@ -251,107 +252,429 @@
                     </li>
                 </ul>
                 <div class="tab-content" id="pills-tabContent">
-                    <div class="tab-pane fade show active" id="pills-one-on-one" role="tabpanel" aria-labelledby="pills-one-on-one-tab" tabindex="0"></div>
+                    <div class="tab-pane fade show active" id="pills-one-on-one" role="tabpanel" aria-labelledby="pills-one-on-one-tab" tabindex="0">
+                        <div class="d-flex justify-content-between mb-4">
+                            <div>
+                                <h4>List</h4>
+                            </div>
+                            <div>
+                                <button class="gradient-button" id="add-session-btn"><i class="fa-solid fa-plus"></i></button>
+                                <button class="gradient-button"><i class="fa-solid fa-list-ul"></i></button>
+                                <button class="gradient-button"><i class="fa-solid fa-calendar-days"></i></button>
+                            </div>
+                        </div>
+                        <div class="card border border-secondary">
+                            <div class="card-body">
+                                <div class="accordion" id="accordionExample">
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+                                            <button class="accordion-button bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                                Wednesday 12 March 2025
+                                            </button>
+                                        </h2>
+                                        <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                                            <div class="accordion-body">
+                                                <div class="d-flex align-items-center justify-content-between p-3 border rounded bg-light mb-3">
+                                                    <div>
+                                                        <h6 class="mb-1 fw-bold">VIP Private session - Your Desires, My Focus</h6>
+                                                        <p class="mb-0 text-muted small">08.00 AM - 09.00 AM</p>
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <img src="{{ asset('icons/tron.png') }}" alt="icon">
+                                                        <span class="me-2 fw-bold">50<span class="text-muted">TK</span></span>
+                                                        <button class="btn btn-secondary btn-sm">Complete</button>
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex align-items-center justify-content-between p-3 border border-success rounded bg-light mb-3">
+                                                    <div class="d-flex align-items-center">
+                                                        <img src="{{ asset('images/profile.png') }}" alt="Profile Picture" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                                        <div>
+                                                            <h6 class="mb-1 fw-bold">William</h6>
+                                                            <p class="mb-1 text-success fw-bold">Spank Me, Tease Me, Please Me</p>
+                                                            <p class="mb-0 text-success small">09.00 AM – 10.00 AM</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <img src="{{ asset('icons/tron-success.png') }}" alt="icon">
+                                                        <span class="me-2 fw-bold text-success">30<span class="text-success">TK</span></span>
+                                                        <button class="btn btn-success btn-sm">Join Now</button>
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex align-items-center justify-content-between p-3 border border-primary rounded bg-light mb-3">
+                                                    <div>
+                                                        <h6 class="mb-1 fw-bold text-primary">Exclusive Private Experience - Just You & Me</h6>
+                                                        <p class="mb-0 small text-primary">11.00 AM - 12.00 AM</p>
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <img src="{{ asset('icons/tron-primary.png') }}" alt="icon">
+                                                        <span class="me-2 fw-bold text-primary">40<span class="text-primary">TK</span></span>
+                                                        <button class="gradient-button" id="edit-session-btn"><i class="fa-solid fa-pen-to-square"></i></button>
+                                                    </div>
+                                                </div>
+                                                <div class="border border-primary rounded bg-light" id="edit-session-form">
+                                                    <div class="card-body">
+                                                        <div class="d-flex justify-content-between align-items-center mb-4">
+                                                            <h5 class="card-title fw-bold">Edit Sessions</h5>
+                                                            <button class="gradient-button">
+                                                                <img src="{{ asset('icons/delete.svg') }}" alt="">
+                                                            </button>
+                                                        </div>
+                                                        <form>
+                                                            <!-- Title -->
+                                                            <div class="mb-3">
+                                                                <label for="sessionTitle" class="form-label">Title</label>
+                                                                <input type="text" class="form-control" id="sessionTitle" value="Exclusive Private Experience – Just You & Me">
+                                                            </div>
+                                                            <!-- Date -->
+                                                            <div class="mb-3">
+                                                                <label for="sessionDate" class="form-label">Date</label>
+                                                                <div class="input-group">
+                                                                    <input type="text" class="form-control" id="sessionDate" value="10 March 2025">
+                                                                    <span class="input-group-text"><i class="fa-regular fa-calendar"></i></span>
+                                                                </div>
+                                                            </div>
+                                                            <!-- Start Time and End Time -->
+                                                            <div class="row g-3">
+                                                                <div class="col-md-6">
+                                                                    <label for="startTime" class="form-label">Start Time</label>
+                                                                    <div class="input-group">
+                                                                        <input type="text" class="form-control" id="startTime" value="09.00 AM">
+                                                                        <span class="input-group-text"><i class="fa-regular fa-clock"></i></span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <label for="endTime" class="form-label">End Time</label>
+                                                                    <div class="input-group">
+                                                                        <input type="text" class="form-control" id="endTime" value="09.00 AM">
+                                                                        <span class="input-group-text"><i class="fa-regular fa-clock"></i></span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <!-- Token -->
+                                                            <div class="mb-3 mt-3">
+                                                                <label for="token" class="form-label">Token</label>
+                                                                <div class="input-group">
+                                                                    <span class="input-group-text"><img src="{{ asset('icons/tron.png') }}" alt="icon"></span>
+                                                                    <input type="text" class="form-control" id="token">
+                                                                </div>
+                                                            </div>
+                                                            <!-- Buttons -->
+                                                            <div class="d-flex justify-content-center mt-4">
+                                                                <button type="button" class="btn btn-outline-secondary rounded-pill me-2">Cancel</button>
+                                                                <button type="submit" class="btn btn-primary rounded-pill" style="background: linear-gradient(to right, #4e54c8, #8f94fb);">Save</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+                                            <button class="accordion-button collapsed bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                                Tuesday 11 March 2025
+                                            </button>
+                                        </h2>
+                                        <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                                            <div class="accordion-body">
+                                                <div class="d-flex align-items-center justify-content-between p-3 border rounded bg-light mb-3">
+                                                    <div>
+                                                        <h6 class="mb-1 fw-bold">VIP Private session - Your Desires, My Focus</h6>
+                                                        <p class="mb-0 text-muted small">08.00 AM - 09.00 AM</p>
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <img src="{{ asset('icons/tron.png') }}" alt="icon">
+                                                        <span class="me-2 fw-bold">50<span class="text-muted">TK</span></span>
+                                                        <button class="btn btn-secondary btn-sm">Complete</button>
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex align-items-center justify-content-between p-3 border border-success rounded bg-light mb-3">
+                                                    <div class="d-flex align-items-center">
+                                                        <img src="{{ asset('images/profile.png') }}" alt="Profile Picture" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                                        <div>
+                                                            <h6 class="mb-1 fw-bold">William</h6>
+                                                            <p class="mb-1 text-success fw-bold">Spank Me, Tease Me, Please Me</p>
+                                                            <p class="mb-0 text-success small">09.00 AM – 10.00 AM</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <img src="{{ asset('icons/tron-success.png') }}" alt="icon">
+                                                        <span class="me-2 fw-bold text-success">30<span class="text-success">TK</span></span>
+                                                        <button class="btn btn-success btn-sm">Join Now</button>
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex align-items-center justify-content-between p-3 border border-primary rounded bg-light mb-3">
+                                                    <div>
+                                                        <h6 class="mb-1 fw-bold text-primary">Exclusive Private Experience - Just You & Me</h6>
+                                                        <p class="mb-0 small text-primary">11.00 AM - 12.00 AM</p>
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <img src="{{ asset('icons/tron-primary.png') }}" alt="icon">
+                                                        <span class="me-2 fw-bold text-primary">40<span class="text-primary">TK</span></span>
+                                                        <button class="gradient-button" id="edit-session-btn"><i class="fa-solid fa-pen-to-square"></i></button>
+                                                    </div>
+                                                </div>
+                                                <div class="border border-primary rounded bg-light" id="edit-session-form">
+                                                    <div class="card-body">
+                                                        <div class="d-flex justify-content-between align-items-center mb-4">
+                                                            <h5 class="card-title fw-bold">Edit Sessions</h5>
+                                                            <button class="gradient-button">
+                                                                <img src="{{ asset('icons/delete.svg') }}" alt="">
+                                                            </button>
+                                                        </div>
+                                                        <form>
+                                                            <!-- Title -->
+                                                            <div class="mb-3">
+                                                                <label for="sessionTitle" class="form-label">Title</label>
+                                                                <input type="text" class="form-control" id="sessionTitle" value="Exclusive Private Experience – Just You & Me">
+                                                            </div>
+                                                            <!-- Date -->
+                                                            <div class="mb-3">
+                                                                <label for="sessionDate" class="form-label">Date</label>
+                                                                <div class="input-group">
+                                                                    <input type="text" class="form-control" id="sessionDate" value="10 March 2025">
+                                                                    <span class="input-group-text"><i class="fa-regular fa-calendar"></i></span>
+                                                                </div>
+                                                            </div>
+                                                            <!-- Start Time and End Time -->
+                                                            <div class="row g-3">
+                                                                <div class="col-md-6">
+                                                                    <label for="startTime" class="form-label">Start Time</label>
+                                                                    <div class="input-group">
+                                                                        <input type="text" class="form-control" id="startTime" value="09.00 AM">
+                                                                        <span class="input-group-text"><i class="fa-regular fa-clock"></i></span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <label for="endTime" class="form-label">End Time</label>
+                                                                    <div class="input-group">
+                                                                        <input type="text" class="form-control" id="endTime" value="09.00 AM">
+                                                                        <span class="input-group-text"><i class="fa-regular fa-clock"></i></span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <!-- Token -->
+                                                            <div class="mb-3 mt-3">
+                                                                <label for="token" class="form-label">Token</label>
+                                                                <div class="input-group">
+                                                                    <span class="input-group-text"><img src="{{ asset('icons/tron.png') }}" alt="icon"></span>
+                                                                    <input type="text" class="form-control" id="token">
+                                                                </div>
+                                                            </div>
+                                                            <!-- Buttons -->
+                                                            <div class="d-flex justify-content-center mt-4">
+                                                                <button type="button" class="btn btn-outline-secondary rounded-pill me-2">Cancel</button>
+                                                                <button type="submit" class="btn btn-primary rounded-pill" style="background: linear-gradient(to right, #4e54c8, #8f94fb);">Save</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+                                            <button class="accordion-button collapsed bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                                Monday 10 March 2025
+                                            </button>
+                                        </h2>
+                                        <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                                            <div class="accordion-body">
+                                                <div class="d-flex align-items-center justify-content-between p-3 border rounded bg-light mb-3">
+                                                    <div>
+                                                        <h6 class="mb-1 fw-bold">VIP Private session - Your Desires, My Focus</h6>
+                                                        <p class="mb-0 text-muted small">08.00 AM - 09.00 AM</p>
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <img src="{{ asset('icons/tron.png') }}" alt="icon">
+                                                        <span class="me-2 fw-bold">50<span class="text-muted">TK</span></span>
+                                                        <button class="btn btn-secondary btn-sm">Complete</button>
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex align-items-center justify-content-between p-3 border border-success rounded bg-light mb-3">
+                                                    <div class="d-flex align-items-center">
+                                                        <img src="{{ asset('images/profile.png') }}" alt="Profile Picture" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                                        <div>
+                                                            <h6 class="mb-1 fw-bold">William</h6>
+                                                            <p class="mb-1 text-success fw-bold">Spank Me, Tease Me, Please Me</p>
+                                                            <p class="mb-0 text-success small">09.00 AM – 10.00 AM</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <img src="{{ asset('icons/tron-success.png') }}" alt="icon">
+                                                        <span class="me-2 fw-bold text-success">30<span class="text-success">TK</span></span>
+                                                        <button class="btn btn-success btn-sm">Join Now</button>
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex align-items-center justify-content-between p-3 border border-primary rounded bg-light mb-3">
+                                                    <div>
+                                                        <h6 class="mb-1 fw-bold text-primary">Exclusive Private Experience - Just You & Me</h6>
+                                                        <p class="mb-0 small text-primary">11.00 AM - 12.00 AM</p>
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <img src="{{ asset('icons/tron-primary.png') }}" alt="icon">
+                                                        <span class="me-2 fw-bold text-primary">40<span class="text-primary">TK</span></span>
+                                                        <button class="gradient-button" id="edit-session-btn"><i class="fa-solid fa-pen-to-square"></i></button>
+                                                    </div>
+                                                </div>
+                                                <div class="border border-primary rounded bg-light" id="edit-session-form">
+                                                    <div class="card-body">
+                                                        <div class="d-flex justify-content-between align-items-center mb-4">
+                                                            <h5 class="card-title fw-bold">Edit Sessions</h5>
+                                                            <button class="gradient-button">
+                                                                <img src="{{ asset('icons/delete.svg') }}" alt="">
+                                                            </button>
+                                                        </div>
+                                                        <form>
+                                                            <!-- Title -->
+                                                            <div class="mb-3">
+                                                                <label for="sessionTitle" class="form-label">Title</label>
+                                                                <input type="text" class="form-control" id="sessionTitle" value="Exclusive Private Experience – Just You & Me">
+                                                            </div>
+                                                            <!-- Date -->
+                                                            <div class="mb-3">
+                                                                <label for="sessionDate" class="form-label">Date</label>
+                                                                <div class="input-group">
+                                                                    <input type="text" class="form-control" id="sessionDate" value="10 March 2025">
+                                                                    <span class="input-group-text"><i class="fa-regular fa-calendar"></i></span>
+                                                                </div>
+                                                            </div>
+                                                            <!-- Start Time and End Time -->
+                                                            <div class="row g-3">
+                                                                <div class="col-md-6">
+                                                                    <label for="startTime" class="form-label">Start Time</label>
+                                                                    <div class="input-group">
+                                                                        <input type="text" class="form-control" id="startTime" value="09.00 AM">
+                                                                        <span class="input-group-text"><i class="fa-regular fa-clock"></i></span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <label for="endTime" class="form-label">End Time</label>
+                                                                    <div class="input-group">
+                                                                        <input type="text" class="form-control" id="endTime" value="09.00 AM">
+                                                                        <span class="input-group-text"><i class="fa-regular fa-clock"></i></span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <!-- Token -->
+                                                            <div class="mb-3 mt-3">
+                                                                <label for="token" class="form-label">Token</label>
+                                                                <div class="input-group">
+                                                                    <span class="input-group-text"><img src="{{ asset('icons/tron.png') }}" alt="icon"></span>
+                                                                    <input type="text" class="form-control" id="token">
+                                                                </div>
+                                                            </div>
+                                                            <!-- Buttons -->
+                                                            <div class="d-flex justify-content-center mt-4">
+                                                                <button type="button" class="btn btn-outline-secondary rounded-pill me-2">Cancel</button>
+                                                                <button type="submit" class="btn btn-primary rounded-pill" style="background: linear-gradient(to right, #4e54c8, #8f94fb);">Save</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="tab-pane fade" id="pills-live-straming" role="tabpanel" aria-labelledby="pills-live-straming-tab" tabindex="0"></div>
                 </div>
-
             </div>
         </div>
-
     </div>
-    <!-- Areas of Expertise -->
-    <!-- <div class="card mb-3 shadow-sm" style="border-radius: 14px;">
-        <div class="card-body d-flex flex-wrap align-items-center">
-            <h6 class="fw-bold mb-0 me-3">Areas of Expertise</h6>
-            <span class="badge bg-light text-dark me-2 mb-2">Tech Reviews</span>
-            <span class="badge bg-light text-dark me-2 mb-2">Lifestyle</span>
-            <span class="badge bg-light text-dark me-2 mb-2">Digital Marketing</span>
-            <span class="badge bg-light text-dark me-2 mb-2">Photography</span>
-            <button class="btn btn-link ms-auto text-primary" style="font-size: 1.1em;"><i class="fas fa-plus"></i> Add</button>
-        </div>
-    </div> -->
-
-    <!-- Create New Content -->
-    <!-- <div class="row g-3 mb-3">
-        <div class="col-md-4">
-            <div class="card h-100 text-center shadow-sm" style="border-radius: 14px;">
-                <div class="card-body d-flex flex-column align-items-center justify-content-center">
-                    <i class="fas fa-pen-nib fa-2x mb-2 text-primary"></i>
-                    <h6 class="fw-bold mb-1">Create Post</h6>
-                    <div class="text-muted small">Share photos or videos</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card h-100 text-center shadow-sm" style="border-radius: 14px;">
-                <div class="card-body d-flex flex-column align-items-center justify-content-center">
-                    <i class="fas fa-broadcast-tower fa-2x mb-2 text-primary"></i>
-                    <h6 class="fw-bold mb-1">Live Session</h6>
-                    <div class="text-muted small">Start streaming</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card h-100 text-center shadow-sm" style="border-radius: 14px;">
-                <div class="card-body d-flex flex-column align-items-center justify-content-center">
-                    <i class="fas fa-user-friends fa-2x mb-2 text-primary"></i>
-                    <h6 class="fw-bold mb-1">One-on-One Session</h6>
-                    <div class="text-muted small">Schedule private sessions</div>
-                </div>
-            </div>
-        </div>
-    </div> -->
-
-    <!-- Session Settings -->
-    <!-- <div class="row g-3">
-        <div class="col-md-6">
-            <div class="card shadow-sm" style="border-radius: 14px;">
-                <div class="card-body">
-                    <h6 class="fw-bold mb-2">One-on-One Sessions</h6>
-                    <div class="row mb-2">
-                        <div class="col-6">
-                            <div class="text-muted small">Session Price</div>
-                            <div class="fw-bold">$50</div>
-                        </div>
-                        <div class="col-6">
-                            <div class="text-muted small">Viewer Price</div>
-                            <div class="fw-bold">$15</div>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <div>
-                            <div class="text-muted small">Available Hours</div>
-                            <div class="fw-bold">Weekly schedule</div>
-                        </div>
-                        <a href="#" class="btn btn-link ms-auto text-primary">Configure</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card shadow-sm" style="border-radius: 14px;">
-                <div class="card-body">
-                    <h6 class="fw-bold mb-2">Live Sessions</h6>
-                    <div class="row mb-2">
-                        <div class="col-6">
-                            <div class="text-muted small">Session Duration</div>
-                            <div class="fw-bold">30 min</div>
-                        </div>
-                        <div class="col-6">
-                            <div class="text-muted small">Default length</div>
-                            <div class="fw-bold">30 min</div>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <div>
-                            <div class="text-muted small">Available Hours</div>
-                            <div class="fw-bold">Custom length</div>
-                        </div>
-                        <a href="#" class="btn btn-link ms-auto text-primary">Configure</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> -->
 </div>
+
+
+<div class="modal fade" id="addSessionModal" tabindex="-1" aria-labelledby="addSessionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addSessionModalLabel">One to One Session</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Date -->
+                <div class="mb-3">
+                    <label for="sessionDate" class="form-label">Date</label>
+                    <input type="text" class="form-control" id="sessionDate" value="10 March 2025" readonly>
+                </div>
+
+                <!-- Post Details -->
+                <h6 class="fw-bold mb-3">Post Details</h6>
+                <div class="form-check form-switch mb-3">
+                    <label class="form-check-label" for="postToggle">Would you like to post this on the feed when only two sessions remain?</label>
+                    <input class="form-check-input" type="checkbox" id="postToggle">
+                </div>
+                <div class="mb-3">
+                    <label for="postTitle" class="form-label">Title</label>
+                    <input type="text" class="form-control" id="postTitle" placeholder="Hurry Up">
+                </div>
+                <div class="mb-3">
+                    <label for="postDescription" class="form-label">Description</label>
+                    <textarea class="form-control" id="postDescription" rows="3" placeholder="Hey you beautiful people, we have only 2 slots left for 30th March. Hurry up and book."></textarea>
+                </div>
+
+                <!-- Slots -->
+                <h6 class="fw-bold mb-3">Slots</h6>
+                <div class="mb-3">
+                    <label for="slotTitle" class="form-label">Title</label>
+                    <input type="text" class="form-control" id="slotTitle" value="Exclusive Private Experience – Just You & Me">
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="startTime" class="form-label">Start Time</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="startTime" value="09.00 AM">
+                            <span class="input-group-text"><i class="fa-regular fa-clock"></i></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="endTime" class="form-label">End Time</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="endTime" value="11.00 AM">
+                            <span class="input-group-text"><i class="fa-regular fa-clock"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3 mt-3">
+                    <label for="token" class="form-label">Token</label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <img src="{{ asset('icons/tron.png') }}" alt="Token Icon" style="width: 20px;">
+                        </span>
+                        <input type="text" class="form-control" id="token" placeholder="Enter token value">
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-end">
+                    <button class="gradient-button me-2">
+                        <img src="{{ asset('icons/delete.svg') }}" alt="">
+                    </button>
+                    <button class="gradient-button"><i class="fa-solid fa-plus"></i></button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" style="background: linear-gradient(to right, #4e54c8, #8f94fb);">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+@section('scripts')
+<script>
+    $(document).ready(function() {
+        $("#edit-session-form").hide();
+        $("#edit-session-btn").click(function() {
+            $("#edit-session-form").slideToggle("slow", "swing");
+        });
+
+        $("#add-session-btn").click(function() {
+            $("#addSessionModal").modal("show");
+        });
+    });
+</script>
 @endsection

@@ -13,9 +13,11 @@ class UpdateUserOnlineStatus
      */
     public function handleAuthenticated(Authenticated $event)
     {
-        $user = $event->user;
-        $user->is_online = true;
-        $user->save();
+        if ($event->guard === 'web') { // Check if the guard is 'web'
+            $user = $event->user;
+            $user->is_online = true;
+            $user->save();
+        }
     }
 
     /**
@@ -23,10 +25,12 @@ class UpdateUserOnlineStatus
      */
     public function handleLogout(Logout $event)
     {
-        $user = $event->user;
-        if ($user) {
-            $user->is_online = false;
-            $user->save();
+        if ($event->guard === 'web') { // Check if the guard is 'web'
+            $user = $event->user;
+            if ($user) {
+                $user->is_online = false;
+                $user->save();
+            }
         }
     }
 }

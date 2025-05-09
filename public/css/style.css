@@ -314,6 +314,15 @@ body {
     transform: translateY(-2px);
 }
 
+.gradient-button{
+    width: 35px;
+    height: 35px;
+    color: #fff;
+    border: none;
+    background: linear-gradient(45deg, #5F2EDF, #1F9EF2, transparent);
+    border-radius: 20px;
+}
+
 @media (max-width: 1200px) {
     .right-sidebar {
         display: none;

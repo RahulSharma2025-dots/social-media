@@ -120,4 +120,9 @@ class User extends Authenticatable
             ? asset('storage/' . $this->profile_image)
             : 'https://ui-avatars.com/api/?name=' . urlencode($this->name);
     }
-} 
+
+    public function preferences()
+    {
+        return $this->hasOne(UserPreference::class);
+    }
+}

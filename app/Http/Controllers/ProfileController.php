@@ -46,8 +46,9 @@ class ProfileController extends Controller
                 ->paginate(10);
         }
         $posts->load('media');
-        // dd($posts->toArray());
-        return view('profile.show', compact('user', 'posts', 'isFollowing', 'upcomingSessions', 'sessions', 'followersCount', 'followingCount','posts'));
+        $preferenceId = auth()->user()->preferences->preference_key;
+        $categoryName = collect(config('preference.categories'))->firstWhere('id', $preferenceId)['name'] ?? 'N.A.';
+        return view('profile.show', compact('user', 'posts', 'isFollowing', 'upcomingSessions', 'sessions', 'followersCount', 'followingCount', 'posts', 'categoryName'));
     }
 
     /** 
@@ -57,7 +58,6 @@ class ProfileController extends Controller
     {
         try {
             $user = User::with(['posts.media', 'followers', 'following'])->findOrFail($userId);
-
             return view('profile.profile_show', [
                 'user' => $user,
                 'posts' => $user->posts,
@@ -74,21 +74,24 @@ class ProfileController extends Controller
 
     public function edit()
     {
-        $user = auth()->user();
-        return view('profile.edit', compact('user'));
+        $user = auth()->user()->load('preferences');
+        $availablePreferences = config('preference');
+        return view('profile.edit', compact('user', 'availablePreferences'));
     }
 
     public function update(Request $request)
     {
+        // dd($request->all());
         try {
             $user = auth()->user();
-
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
                 'username' => 'required|string|max:255|unique:users,username,' . $user->id,
                 'bio' => 'nullable|string|max:1000',
-                'profile_picture' => 'nullable|image|max:2048'
+                'profile_picture' => 'nullable|image|max:2048',
+                'preferences' => 'nullable',
             ]);
+            // dd($validated);
             if ($request->hasFile('profile_picture')) {
                 if ($user->profile_picture) {
                     Storage::disk('public')->delete($user->profile_picture);
@@ -100,12 +103,19 @@ class ProfileController extends Controller
 
             $user->update($validated);
 
+            if (isset($validated['preferences'])) {
+                $user->preferences()->delete();
+                // foreach ($validated['preferences'] as $preference) {
+                $user->preferences()->create(['preference_key' => $validated['preferences']]);
+                // }
+            }
+
             return redirect()->route('profile')->with('success', 'Profile updated successfully');
         } catch (\Illuminate\Validation\ValidationException $e) {
             return redirect()->back()->withErrors($e->validator)->withInput();
         } catch (\Exception $e) {
             Log::error('Error updating profile: ' . $e->getMessage());
-    
+
             return redirect()->back()->with('error', 'An error occurred while updating the profile.');
         }
     }
@@ -152,8 +162,8 @@ class ProfileController extends Controller
             return view('profile.followers_and_following', compact('user', 'users', 'title', 'type'));
         } catch (\Exception $e) {
             Log::error('Error fetching followers or following: ' . $e->getMessage());
-    
+
             return redirect()->route('home')->with('error', 'Unable to fetch followers or following.');
-        }   
+        }
     }
 }
